@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>Kalender</title>
+    <link rel="stylesheet" href="calendar.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Google Font Link for Icons -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200">
+  </head>
+  <body>
+    <div class="wrapper">
+      <header class="plan-header">
+        <p>Meal Planner</p>
+      </header>
+      <header>
+        <p class="current-date"></p>
+        <div class="icons">
+          <span id="prev" class="material-symbols-rounded">chevron_left</span>
+          <span id="next" class="material-symbols-rounded">chevron_right</span>
+        </div>
+      </header>
+      <div class="calendar">
+        <ul class="weeks">
+          <li>Sun</li>
+          <li>Mon</li>
+          <li>Tue</li>
+          <li>Wed</li>
+          <li>Thu</li>
+          <li>Fri</li>
+          <li>Sat</li>
+        </ul>
+        <ul class="days"></ul>
+      </div>
+      <div class="todays-meal">
+        <p class="todays-header">Today's Meal Plan:</p>
+        <ul class="meal-list">
+          <li> -  Nasi + Tumis Tahu Brokoli</li>
+          <li> -  Salad Sayur + Jus Buah Naga</li>
+          <li> -  Nasi + Ayam Jamur Teriyaki</li>
+          <li> - </li>
+          <li> - </li>
+          <li> - </li>
+        </ul>
+      </div>
+    </div>
+  </body>
+  <script>
+    const daysTag = document.querySelector(".days"),
+  currentDate = document.querySelector(".current-date"),
+  prevNextIcon = document.querySelectorAll(".icons span");
+
+let selectedDate = new Date(),
+  currYear = selectedDate.getFullYear(),
+  currMonth = selectedDate.getMonth();
+
+const months = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December"
+];
+
+const renderCalendar = () => {
+  let firstDayofMonth = new Date(currYear, currMonth, 1).getDay(),
+    lastDateofMonth = new Date(currYear, currMonth + 1, 0).getDate(),
+    lastDayofMonth = new Date(currYear, currMonth, lastDateofMonth).getDay(),
+    lastDateofLastMonth = new Date(currYear, currMonth, 0).getDate();
+  let liTag = "";
+
+  for (let i = firstDayofMonth; i > 0; i--) {
+    liTag += `<li class="inactive">${lastDateofLastMonth - i + 1}</li>`;
+  }
+
+  for (let i = 1; i <= lastDateofMonth; i++) {
+    let isActive =
+      i === selectedDate.getDate() &&
+      currMonth === selectedDate.getMonth() &&
+      currYear === selectedDate.getFullYear();
+    liTag += `<li class="${isActive ? "active" : ""}" data-day="${i}">${i}</li>`;
+  }
+
+  for (let i = lastDayofMonth; i < 6; i++) {
+    liTag += `<li class="inactive">${i - lastDayofMonth + 1}</li>`;
+  }
+  currentDate.innerText = `${months[currMonth]} ${currYear}`;
+  daysTag.innerHTML = liTag;
+
+  // Menambahkan event listener untuk setiap elemen li
+  const dayElements = document.querySelectorAll(".days li");
+  dayElements.forEach((day) => {
+    day.addEventListener("click", () => {
+      const clickedDay = parseInt(day.getAttribute("data-day"), 10);
+
+      // Jika tanggal yang diklik adalah tanggal yang sedang aktif, atur tanggal ke hari ini
+      if (
+        clickedDay === selectedDate.getDate() &&
+        currMonth === selectedDate.getMonth() &&
+        currYear === selectedDate.getFullYear()
+      ) {
+        selectedDate = new Date();
+      } else {
+        selectedDate = new Date(currYear, currMonth, clickedDay);
+      }
+
+      renderCalendar();
+    });
+  });
+};
+
+renderCalendar();
+
+prevNextIcon.forEach((icon) => {
+  icon.addEventListener("click", () => {
+    currMonth = icon.id === "prev" ? currMonth - 1 : currMonth + 1;
+
+    if (currMonth < 0 || currMonth > 11) {
+      selectedDate = new Date(currYear, currMonth, selectedDate.getDate());
+      currYear = selectedDate.getFullYear();
+      currMonth = selectedDate.getMonth();
+    } else {
+      selectedDate = new Date(currYear, currMonth, selectedDate.getDate());
+    }
+    renderCalendar();
+  });
+});
+  </script>
+</html>
